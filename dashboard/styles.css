@@ -72,6 +72,17 @@ body {
   color: var(--muted);
 }
 
+.banner {
+  margin-top: 1rem;
+  max-width: 40rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  background: #f8e4d6;
+  color: #7a3b16;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
 .meta strong {
   color: var(--ink);
 }

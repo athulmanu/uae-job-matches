@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
 
 from config_loader import all_target_roles, load_config  # noqa: E402
-from fetchers import collect_jobs  # noqa: E402
+from fetchers import collect_jobs, uae_apis_configured  # noqa: E402
 from matcher import rank_jobs  # noqa: E402
 from sheets import push_google_sheet  # noqa: E402
 from writers import write_csv, write_excel, write_json  # noqa: E402
@@ -58,7 +58,14 @@ def main() -> int:
     roles = all_target_roles(cfg)
     queries = search_queries(roles)
 
+    apis = uae_apis_configured()
     print(f"[{datetime.now(timezone.utc).isoformat()}] Fetching jobs…")
+    print(f"  UAE APIs — JSearch: {apis['jsearch']} | Jooble: {apis['jooble']}")
+    if not (apis["jsearch"] or apis["jooble"]):
+        print(
+            "  WARNING: No RAPIDAPI_KEY / JOOBLE_API_KEY — UAE local boards unavailable. "
+            "Worldwide remote fillers are disabled."
+        )
     raw = collect_jobs(cfg, queries)
     print(f"  Raw candidates after location/age filters: {len(raw)}")
     matched = rank_jobs(raw, cfg, roles)
@@ -83,6 +90,13 @@ def main() -> int:
             "max_age_hours": cfg.get("max_age_hours"),
             "min_score": cfg.get("min_score"),
             "role_count": len(roles),
+            "uae_apis": apis,
+            "needs_api_keys": not (apis["jsearch"] or apis["jooble"]),
+            "message": (
+                None
+                if (apis["jsearch"] or apis["jooble"])
+                else "Add RAPIDAPI_KEY (JSearch) and/or JOOBLE_API_KEY for Dubai/Abu Dhabi jobs."
+            ),
         },
     )
 

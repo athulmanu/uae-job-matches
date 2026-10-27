@@ -19,6 +19,7 @@ function fmtWhen(iso) {
 function render(data) {
   const list = document.getElementById("list");
   const meta = document.getElementById("meta");
+  const banner = document.getElementById("banner");
   const q = document.getElementById("q").value.trim().toLowerCase();
   const resume = document.getElementById("resume").value;
   const sort = document.getElementById("sort").value;
@@ -44,8 +45,21 @@ function render(data) {
     <span>Showing <strong>${jobs.length}</strong></span>
   `;
 
+  if (data.meta?.needs_api_keys) {
+    banner.hidden = false;
+    banner.textContent =
+      data.meta.message ||
+      "Add RAPIDAPI_KEY (JSearch) and/or JOOBLE_API_KEY in GitHub Secrets for Dubai/Abu Dhabi jobs. Worldwide remote fillers are turned off.";
+  } else {
+    banner.hidden = true;
+  }
+
   if (!jobs.length) {
-    list.innerHTML = `<div class="empty">No jobs match this filter. Re-run the daily script or loosen filters.</div>`;
+    list.innerHTML = `<div class="empty">${
+      data.meta?.needs_api_keys
+        ? "No UAE jobs yet — add free API keys (JSearch / Jooble AE), then re-run the daily Action."
+        : "No jobs match this filter for Dubai/Abu Dhabi right now. Check again after the next daily run."
+    }</div>`;
     return;
   }
 

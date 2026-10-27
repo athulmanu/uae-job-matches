@@ -33,6 +33,7 @@ jobs:
       - name: Run matcher
         env:
           RAPIDAPI_KEY: ${{ secrets.RAPIDAPI_KEY }}
+          JOOBLE_API_KEY: ${{ secrets.JOOBLE_API_KEY }}
           GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
           GOOGLE_SERVICE_ACCOUNT_JSON_CONTENT: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
         run: |

@@ -14,20 +14,22 @@ locations:
   - Dubai, UAE
   - Abu Dhabi, UAE
 
-# Prefer remote-in-UAE or hybrid in Dubai/Abu Dhabi
+# Prefer remote-in-UAE / MENA / GCC — not random Worldwide remote
 include_remote_uae: true
 
-# Preferred freshness window when RAPIDAPI_KEY (JSearch) is set
+# Preferred freshness window when UAE APIs are configured
 max_age_hours: 24
-# Used when RAPIDAPI_KEY is missing (free remote boards only).
-# True "last 24h Dubai/Abu Dhabi" coverage needs RAPIDAPI_KEY (JSearch).
-fallback_max_age_hours: 336
+# Wider window only while waiting for API keys (still UAE/MENA-only)
+fallback_max_age_hours: 72
 
 # Minimum match score (0–100) to include in the sheet
 min_score: 45
 
-# Keep strong React Native / mobile remote roles even if location is Worldwide
-allow_worldwide_remote_stack: true
+# Off = do not list Worldwide RemoteOK fillers (Somnio-style). UAE/MENA only.
+allow_worldwide_remote_stack: false
+
+# Skip Remotive/RemoteOK/Jobicy unless UAE APIs are missing AND this is true
+use_global_remote_boards: false
 
 resumes:
   five_plus:

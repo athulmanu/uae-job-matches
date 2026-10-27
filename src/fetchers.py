@@ -306,17 +306,78 @@ def fetch_jsearch(queries: list[str], locations: list[str]) -> list[dict[str, An
     for role in queries[:6]:
         for city in ("Dubai", "Abu Dhabi", "UAE"):
             place_queries.append(f"{role} in {city}")
-    for q in place_queries[:12]:
+    # date_posted: today when possible; also yesterday for fuller UAE digests
+    for date_posted in ("today", "yesterday"):
+        for q in place_queries[:10]:
+            try:
+                r = requests.get(
+                    "https://jsearch.p.rapidapi.com/search",
+                    headers=headers,
+                    params={
+                        "query": q,
+                        "page": "1",
+                        "num_pages": "1",
+                        "date_posted": date_posted,
+                        "country": "ae",
+                    },
+                    timeout=TIMEOUT,
+                )
+                if r.status_code != 200:
+                    continue
+                data = r.json()
+            except requests.RequestException:
+                continue
+            for item in data.get("data", []) or []:
+                jid = str(item.get("job_id") or item.get("job_apply_link"))
+                if not jid or jid in seen:
+                    continue
+                seen.add(jid)
+                loc_parts = [
+                    item.get("job_city") or "",
+                    item.get("job_state") or "",
+                    item.get("job_country") or "",
+                ]
+                jobs.append(
+                    _norm_job(
+                        source="jsearch",
+                        job_id=jid,
+                        title=item.get("job_title") or "",
+                        company=item.get("employer_name") or "",
+                        location=", ".join(p for p in loc_parts if p) or "UAE",
+                        url=item.get("job_apply_link") or item.get("job_google_link") or "",
+                        description=item.get("job_description") or "",
+                        posted_at=item.get("job_posted_at_datetime_utc")
+                        or item.get("job_posted_at_timestamp"),
+                    )
+                )
+    return jobs
+
+
+def fetch_jooble(queries: list[str]) -> list[dict[str, Any]]:
+    """UAE Jooble REST API — register at https://ae.jooble.org/api/about
+    Set JOOBLE_API_KEY (UAE-domain key only).
+    """
+    key = os.environ.get("JOOBLE_API_KEY", "").strip()
+    if not key:
+        return []
+    jobs: list[dict[str, Any]] = []
+    seen: set[str] = set()
+    endpoint = f"https://ae.jooble.org/api/{key}"
+    searches = []
+    for role in queries[:8]:
+        for city in ("Dubai", "Abu Dhabi", "UAE"):
+            searches.append((role, city))
+    for keywords, location in searches[:15]:
         try:
-            r = requests.get(
-                "https://jsearch.p.rapidapi.com/search",
-                headers=headers,
-                params={
-                    "query": q,
+            r = requests.post(
+                endpoint,
+                headers={**UA, "Content-Type": "application/json"},
+                json={
+                    "keywords": keywords,
+                    "location": location,
                     "page": "1",
-                    "num_pages": "1",
-                    "date_posted": "today",
-                    "country": "ae",
+                    "ResultOnPage": "20",
+                    "companysearch": "false",
                 },
                 timeout=TIMEOUT,
             )
@@ -325,47 +386,53 @@ def fetch_jsearch(queries: list[str], locations: list[str]) -> list[dict[str, An
             data = r.json()
         except requests.RequestException:
             continue
-        for item in data.get("data", []) or []:
-            jid = str(item.get("job_id") or item.get("job_apply_link"))
+        for item in data.get("jobs", []) or []:
+            jid = str(item.get("id") or item.get("link"))
             if not jid or jid in seen:
                 continue
             seen.add(jid)
-            loc_parts = [
-                item.get("job_city") or "",
-                item.get("job_state") or "",
-                item.get("job_country") or "",
-            ]
             jobs.append(
                 _norm_job(
-                    source="jsearch",
+                    source="jooble",
                     job_id=jid,
-                    title=item.get("job_title") or "",
-                    company=item.get("employer_name") or "",
-                    location=", ".join(p for p in loc_parts if p),
-                    url=item.get("job_apply_link") or item.get("job_google_link") or "",
-                    description=item.get("job_description") or "",
-                    posted_at=item.get("job_posted_at_datetime_utc")
-                    or item.get("job_posted_at_timestamp"),
+                    title=item.get("title") or "",
+                    company=item.get("company") or "",
+                    location=item.get("location") or location,
+                    url=item.get("link") or "",
+                    description=item.get("snippet") or "",
+                    posted_at=item.get("updated"),
                 )
             )
     return jobs
+
+
+def uae_apis_configured() -> dict[str, bool]:
+    return {
+        "jsearch": bool(os.environ.get("RAPIDAPI_KEY", "").strip()),
+        "jooble": bool(os.environ.get("JOOBLE_API_KEY", "").strip()),
+    }
 
 
 def collect_jobs(cfg: dict[str, Any], search_queries: list[str]) -> list[dict[str, Any]]:
     locations = cfg.get("locations") or []
     max_age = int(cfg.get("max_age_hours") or 24)
     include_remote = bool(cfg.get("include_remote_uae", True))
-    # Without JSearch, Dubai office roles are scarce on free boards — widen age window.
-    has_jsearch = bool(os.environ.get("RAPIDAPI_KEY", "").strip())
-    if not has_jsearch:
+    apis = uae_apis_configured()
+    has_uae_api = apis["jsearch"] or apis["jooble"]
+    if not has_uae_api:
         max_age = max(max_age, int(cfg.get("fallback_max_age_hours") or 72))
 
     raw: list[dict[str, Any]] = []
-    raw.extend(fetch_remotive(search_queries))
-    raw.extend(fetch_jobicy(search_queries))
-    raw.extend(fetch_remoteok())
-    raw.extend(fetch_arbeitnow(search_queries))
+    # Primary: UAE-capable APIs
     raw.extend(fetch_jsearch(search_queries, locations))
+    raw.extend(fetch_jooble(search_queries))
+
+    # Global remote boards only if explicitly enabled (off by default — stops Somnio fillers)
+    if cfg.get("use_global_remote_boards"):
+        raw.extend(fetch_remotive(search_queries))
+        raw.extend(fetch_jobicy(search_queries))
+        raw.extend(fetch_remoteok())
+        raw.extend(fetch_arbeitnow(search_queries))
 
     # de-dupe by URL/title+company
     seen: set[str] = set()
@@ -377,7 +444,7 @@ def collect_jobs(cfg: dict[str, Any], search_queries: list[str]) -> list[dict[st
         alt = f"{job['title'].lower()}|{job['company'].lower()}"
         if key in seen or alt in seen:
             continue
-        allow_ww = bool(cfg.get("allow_worldwide_remote_stack", True))
+        allow_ww = bool(cfg.get("allow_worldwide_remote_stack", False))
         if not _location_ok(job, locations, include_remote, allow_ww):
             continue
         # Extra gate for remote boards: title must be stack-relevant
@@ -403,6 +470,5 @@ def collect_jobs(cfg: dict[str, Any], search_queries: list[str]) -> list[dict[st
             continue
         seen.add(key)
         seen.add(alt)
-        # drop internal posted_dt before serialize later
         filtered.append(job)
     return filtered

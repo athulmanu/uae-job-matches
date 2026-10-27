@@ -44,12 +44,16 @@ cd dashboard && python -m http.server 5175
 
 Without this, use the Excel/CSV and **File → Import** into Sheets.
 
-## Stronger UAE coverage (recommended)
+## UAE coverage (required for Dubai / Abu Dhabi)
 
-Free remote boards rarely list Dubai office roles. For local UAE postings:
+Worldwide RemoteOK fillers are **off**. Without at least one key below, the dashboard stays empty on purpose.
 
-1. Sign up at [RapidAPI JSearch](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch)  
-2. Set `RAPIDAPI_KEY` in `.env` and as GitHub secret `RAPIDAPI_KEY`
+| Secret | Free signup | What it adds |
+|--------|-------------|--------------|
+| `RAPIDAPI_KEY` | [JSearch on RapidAPI](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch) | Best “posted today/yesterday” Dubai & Abu Dhabi search |
+| `JOOBLE_API_KEY` | [Jooble UAE API](https://ae.jooble.org/api/about) | Extra UAE board aggregation (lifetime free quota) |
+
+Add them under **Repo → Settings → Secrets and variables → Actions**, then **Actions → Daily UAE job matches → Run workflow**.
 
 ## GitHub deploy (`athulmanu`)
 
