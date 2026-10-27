@@ -302,23 +302,32 @@ def fetch_jsearch(queries: list[str], locations: list[str]) -> list[dict[str, An
         "x-rapidapi-key": key,
         "x-rapidapi-host": "jsearch.p.rapidapi.com",
     }
-    place_queries = []
-    for role in queries[:6]:
-        for city in ("Dubai", "Abu Dhabi", "UAE"):
-            place_queries.append(f"{role} in {city}")
-    # date_posted: today when possible; also yesterday for fuller UAE digests
-    for date_posted in ("today", "yesterday"):
-        for q in place_queries[:10]:
+    # Docs: include title + location in query; country must be set (ae = UAE).
+    # date_posted allowed: all | today | 3days | week | month  (no "yesterday")
+    place_queries = [
+        "React Native developer in Dubai",
+        "React Native developer in Abu Dhabi",
+        "Senior React Native engineer in UAE",
+        "Mobile application developer in Dubai",
+        "Full Stack JavaScript developer in Dubai",
+        "Full Stack developer in Abu Dhabi",
+        "React Node.js developer in Dubai",
+        "Frontend React developer banking in Dubai",
+        "MERN stack developer in UAE",
+        "Software engineer React Native in Abu Dhabi",
+    ]
+    for date_posted in ("today", "3days"):
+        for q in place_queries:
             try:
                 r = requests.get(
                     "https://jsearch.p.rapidapi.com/search",
                     headers=headers,
                     params={
                         "query": q,
-                        "page": "1",
                         "num_pages": "1",
                         "date_posted": date_posted,
                         "country": "ae",
+                        "employment_types": "FULLTIME,CONTRACTOR",
                     },
                     timeout=TIMEOUT,
                 )
