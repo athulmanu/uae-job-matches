@@ -91,14 +91,20 @@ def is_relevant_title(job: dict[str, Any]) -> bool:
         "android",
         "full stack",
         "fullstack",
+        "full-stack",
         "front end",
         "frontend",
+        "front-end",
         "node.js",
         "nodejs",
         "javascript",
         "typescript",
         "mern",
         "next.js",
+        "software engineer",
+        "software developer",
+        "application developer",
+        "application engineer",
     )
     return any(a in title for a in accept)
 

@@ -60,12 +60,10 @@ def main() -> int:
 
     apis = uae_apis_configured()
     print(f"[{datetime.now(timezone.utc).isoformat()}] Fetching jobs…")
-    print(f"  UAE APIs — JSearch: {apis['jsearch']} | Jooble: {apis['jooble']}")
-    if not (apis["jsearch"] or apis["jooble"]):
-        print(
-            "  WARNING: No RAPIDAPI_KEY / JOOBLE_API_KEY — UAE local boards unavailable. "
-            "Worldwide remote fillers are disabled."
-        )
+    print(
+        f"  Sources — Career boards: {apis.get('career_boards')} | "
+        f"JSearch: {apis['jsearch']} | Jooble: {apis['jooble']}"
+    )
     raw = collect_jobs(cfg, queries)
     print(f"  Raw candidates after location/age filters: {len(raw)}")
     matched = rank_jobs(raw, cfg, roles)
@@ -91,11 +89,12 @@ def main() -> int:
             "min_score": cfg.get("min_score"),
             "role_count": len(roles),
             "uae_apis": apis,
-            "needs_api_keys": not (apis["jsearch"] or apis["jooble"]),
+            "needs_api_keys": False,
             "message": (
-                None
-                if (apis["jsearch"] or apis["jooble"])
-                else "Add RAPIDAPI_KEY (JSearch) and/or JOOBLE_API_KEY for Dubai/Abu Dhabi jobs."
+                "Pulling UAE roles from curated company career pages (Greenhouse/Lever). "
+                "JSearch optional for broader coverage."
+                if not apis["jsearch"]
+                else None
             ),
         },
     )

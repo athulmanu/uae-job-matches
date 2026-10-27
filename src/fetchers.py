@@ -419,31 +419,129 @@ def uae_apis_configured() -> dict[str, bool]:
     return {
         "jsearch": bool(os.environ.get("RAPIDAPI_KEY", "").strip()),
         "jooble": bool(os.environ.get("JOOBLE_API_KEY", "").strip()),
+        "career_boards": True,  # always on — public Greenhouse/Lever, no key
     }
+
+
+def _load_boards() -> dict[str, Any]:
+    from pathlib import Path
+
+    import yaml
+
+    path = Path(__file__).resolve().parents[1] / "boards.yaml"
+    if not path.exists():
+        return {}
+    with path.open(encoding="utf-8") as f:
+        return yaml.safe_load(f) or {}
+
+
+def _uae_location(text: str, keywords: list[str]) -> bool:
+    blob = (text or "").lower()
+    return any(k.lower() in blob for k in keywords)
+
+
+def fetch_greenhouse_boards() -> list[dict[str, Any]]:
+    boards = _load_boards()
+    tokens = boards.get("greenhouse") or []
+    keywords = boards.get("location_keywords") or [
+        "dubai",
+        "abu dhabi",
+        "uae",
+        "united arab emirates",
+    ]
+    jobs: list[dict[str, Any]] = []
+    for token in tokens:
+        url = f"https://boards-api.greenhouse.io/v1/boards/{token}/jobs"
+        try:
+            r = requests.get(url, headers=UA, params={"content": "true"}, timeout=TIMEOUT)
+            if r.status_code != 200:
+                continue
+            data = r.json()
+        except requests.RequestException:
+            continue
+        for item in data.get("jobs") or []:
+            loc = (item.get("location") or {}).get("name") or ""
+            if not _uae_location(loc, keywords):
+                continue
+            jid = str(item.get("id") or item.get("absolute_url"))
+            jobs.append(
+                _norm_job(
+                    source=f"greenhouse:{token}",
+                    job_id=jid,
+                    title=item.get("title") or "",
+                    company=token.replace("-", " ").title(),
+                    location=loc or "UAE",
+                    url=item.get("absolute_url") or "",
+                    description=re.sub(r"<[^>]+>", " ", item.get("content") or "")[:4000],
+                    posted_at=item.get("updated_at") or item.get("first_published"),
+                )
+            )
+    return jobs
+
+
+def fetch_lever_boards() -> list[dict[str, Any]]:
+    boards = _load_boards()
+    companies = boards.get("lever") or []
+    keywords = boards.get("location_keywords") or ["dubai", "abu dhabi", "uae"]
+    jobs: list[dict[str, Any]] = []
+    for company in companies:
+        url = f"https://api.lever.co/v0/postings/{company}?mode=json"
+        try:
+            r = requests.get(url, headers=UA, timeout=TIMEOUT)
+            if r.status_code != 200:
+                continue
+            data = r.json()
+        except requests.RequestException:
+            continue
+        if not isinstance(data, list):
+            continue
+        for item in data:
+            loc = item.get("location") or item.get("workplaceType") or ""
+            categories = item.get("categories") or {}
+            loc_blob = f"{loc} {categories.get('location','')} {categories.get('commitment','')}"
+            if not _uae_location(loc_blob, keywords):
+                continue
+            jid = str(item.get("id") or item.get("hostedUrl"))
+            jobs.append(
+                _norm_job(
+                    source=f"lever:{company}",
+                    job_id=jid,
+                    title=item.get("text") or "",
+                    company=company.replace("-", " ").title(),
+                    location=categories.get("location") or loc or "UAE",
+                    url=item.get("hostedUrl") or item.get("applyUrl") or "",
+                    description=re.sub(
+                        r"<[^>]+>", " ", (item.get("descriptionPlain") or item.get("description") or "")
+                    )[:4000],
+                    posted_at=item.get("createdAt"),
+                )
+            )
+    return jobs
 
 
 def collect_jobs(cfg: dict[str, Any], search_queries: list[str]) -> list[dict[str, Any]]:
     locations = cfg.get("locations") or []
     max_age = int(cfg.get("max_age_hours") or 24)
     include_remote = bool(cfg.get("include_remote_uae", True))
-    apis = uae_apis_configured()
-    has_uae_api = apis["jsearch"] or apis["jooble"]
-    if not has_uae_api:
-        max_age = max(max_age, int(cfg.get("fallback_max_age_hours") or 72))
+    boards_cfg = _load_boards()
+    board_age = int(boards_cfg.get("max_age_hours") or 336)
 
     raw: list[dict[str, Any]] = []
-    # Primary: UAE-capable APIs
+    # Primary (no API key): curated UAE career pages via public ATS JSON
+    raw.extend(fetch_greenhouse_boards())
+    raw.extend(fetch_lever_boards())
+
+    # Optional paid/free search APIs if keys work
     raw.extend(fetch_jsearch(search_queries, locations))
     raw.extend(fetch_jooble(search_queries))
 
-    # Global remote boards only if explicitly enabled (off by default — stops Somnio fillers)
+    # Global remote boards only if explicitly enabled
     if cfg.get("use_global_remote_boards"):
         raw.extend(fetch_remotive(search_queries))
         raw.extend(fetch_jobicy(search_queries))
         raw.extend(fetch_remoteok())
         raw.extend(fetch_arbeitnow(search_queries))
 
-    # de-dupe by URL/title+company
     seen: set[str] = set()
     filtered: list[dict[str, Any]] = []
     for job in raw:
@@ -454,9 +552,13 @@ def collect_jobs(cfg: dict[str, Any], search_queries: list[str]) -> list[dict[st
         if key in seen or alt in seen:
             continue
         allow_ww = bool(cfg.get("allow_worldwide_remote_stack", False))
-        if not _location_ok(job, locations, include_remote, allow_ww):
-            continue
-        # Extra gate for remote boards: title must be stack-relevant
+        # Career-board jobs already location-filtered; still run soft check
+        if job["source"].startswith(("greenhouse:", "lever:")):
+            age_limit = board_age
+        else:
+            if not _location_ok(job, locations, include_remote, allow_ww):
+                continue
+            age_limit = max_age
         if job["source"] in ("remotive", "jobicy", "remoteok", "arbeitnow"):
             title = job["title"].lower()
             if not any(
@@ -472,10 +574,11 @@ def collect_jobs(cfg: dict[str, Any], search_queries: list[str]) -> list[dict[st
                     "javascript",
                     "typescript",
                     "node",
+                    "software engineer",
                 )
             ):
                 continue
-        if not _within_hours(job, max_age):
+        if not _within_hours(job, age_limit):
             continue
         seen.add(key)
         seen.add(alt)

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-27T19:43:14.250763+00:00",
+  "generated_at": "2026-10-27T20:00:48.776723+00:00",
   "count": 0,
   "meta": {
     "locations": [
@@ -11,14 +11,15 @@
       "Abu Dhabi, UAE"
     ],
     "max_age_hours": 24,
-    "min_score": 45,
+    "min_score": 35,
     "role_count": 31,
     "uae_apis": {
-      "jsearch": false,
-      "jooble": false
+      "jsearch": true,
+      "jooble": false,
+      "career_boards": true
     },
-    "needs_api_keys": true,
-    "message": "Add RAPIDAPI_KEY (JSearch) and/or JOOBLE_API_KEY for Dubai/Abu Dhabi jobs."
+    "needs_api_keys": false,
+    "message": null
   },
   "jobs": []
 }

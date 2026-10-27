@@ -44,16 +44,18 @@ cd dashboard && python -m http.server 5175
 
 Without this, use the Excel/CSV and **File → Import** into Sheets.
 
-## UAE coverage (required for Dubai / Abu Dhabi)
+## UAE coverage (no JSearch required)
 
-Worldwide RemoteOK fillers are **off**. Without at least one key below, the dashboard stays empty on purpose.
+Default source: **curated company career pages** in `boards.yaml` (public Greenhouse / Lever JSON) filtered to Dubai / Abu Dhabi / UAE. Works with **zero API keys**.
 
-| Secret | Free signup | What it adds |
-|--------|-------------|--------------|
-| `RAPIDAPI_KEY` | [JSearch on RapidAPI](https://rapidapi.com/letscrape-6bRBa3QguO5/api/jsearch) | Best “posted today/yesterday” Dubai & Abu Dhabi search |
-| `JOOBLE_API_KEY` | [Jooble UAE API](https://ae.jooble.org/api/about) | Extra UAE board aggregation (lifetime free quota) |
+Optional extras (if you get them working):
 
-Add them under **Repo → Settings → Secrets and variables → Actions**, then **Actions → Daily UAE job matches → Run workflow**.
+| Secret | What it adds |
+|--------|--------------|
+| `RAPIDAPI_KEY` | Broader Google-for-Jobs style search (JSearch) |
+| `JOOBLE_API_KEY` | Extra UAE aggregator |
+
+Add company board tokens to `boards.yaml` anytime (e.g. `careem`, `deliveroo`).
 
 ## GitHub deploy (`athulmanu`)
 

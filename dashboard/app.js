@@ -55,11 +55,11 @@ function render(data) {
   }
 
   if (!jobs.length) {
-    list.innerHTML = `<div class="empty">${
-      data.meta?.needs_api_keys
-        ? "No UAE jobs yet — add free API keys (JSearch / Jooble AE), then re-run the daily Action."
-        : "No jobs match this filter for Dubai/Abu Dhabi right now. Check again after the next daily run."
-    }</div>`;
+    list.innerHTML = `<div class="empty">
+      No React Native / Full Stack matches in Dubai–Abu Dhabi on tracked company career pages right now.
+      The daily job keeps checking Careem, Deliveroo, GitLab, and other boards in <code>boards.yaml</code>.
+      For wider UAE coverage (Indeed etc. via Google for Jobs), subscribe to JSearch Basic ($0) and add <code>RAPIDAPI_KEY</code>.
+    </div>`;
     return;
   }
 

@@ -23,7 +23,7 @@ max_age_hours: 24
 fallback_max_age_hours: 72
 
 # Minimum match score (0–100) to include in the sheet
-min_score: 45
+min_score: 35
 
 # Off = do not list Worldwide RemoteOK fillers (Somnio-style). UAE/MENA only.
 allow_worldwide_remote_stack: false

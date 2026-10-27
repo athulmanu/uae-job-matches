@@ -1,0 +1,57 @@
+# Public ATS boards that regularly list Dubai / Abu Dhabi / UAE roles.
+# No API key required — Greenhouse / Lever public JSON only.
+# Add more tokens anytime (token = boards.greenhouse.io/{token}).
+
+greenhouse:
+  - careem
+  - deliveroo
+  - gitlab
+  - coinbase
+  - mongodb
+  - elastic
+  - scaleai
+  - stripe # rarely UAE; kept for MENA remote checks
+  - spotify
+  - shopify
+  - datadog
+  - cloudflare
+  - hashicorp
+  - snowflake
+  - databricks
+  - notion
+  - figma
+  - canva
+  - block
+  - twilio
+  - hubspot
+  - salesforce
+  - zendesk
+  - airbnb
+  - uber
+  - lyft
+  - doordash
+  - amazon
+  - microsoft
+  - nvidia
+  - ibm
+  - oracle
+  - accenture
+  - thoughtworks
+  - epam
+
+lever:
+  - palantir
+
+# Only keep postings whose location mentions these (case-insensitive)
+location_keywords:
+  - dubai
+  - abu dhabi
+  - abudhabi
+  - uae
+  - united arab emirates
+  - sharjah
+  - ras al khaimah
+  - ajman
+
+# Career boards often lack a true "posted today" stamp — use updated_at window
+max_age_hours: 336
