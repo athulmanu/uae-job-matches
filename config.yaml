@@ -1,0 +1,124 @@
+# Job match automation — Athul S Babu (UAE)
+candidate:
+  name: Athul S Babu
+  email: athul290@gmail.com
+  phone: "+971 55 838 6904"
+  linkedin: https://www.linkedin.com/in/athulsbabu
+  base_location: Abu Dhabi, UAE
+
+locations:
+  - Dubai
+  - Abu Dhabi
+  - UAE
+  - United Arab Emirates
+  - Dubai, UAE
+  - Abu Dhabi, UAE
+
+# Prefer remote-in-UAE or hybrid in Dubai/Abu Dhabi
+include_remote_uae: true
+
+# Preferred freshness window when RAPIDAPI_KEY (JSearch) is set
+max_age_hours: 24
+# Used when RAPIDAPI_KEY is missing (free remote boards only).
+# True "last 24h Dubai/Abu Dhabi" coverage needs RAPIDAPI_KEY (JSearch).
+fallback_max_age_hours: 336
+
+# Minimum match score (0–100) to include in the sheet
+min_score: 45
+
+# Keep strong React Native / mobile remote roles even if location is Worldwide
+allow_worldwide_remote_stack: true
+
+resumes:
+  five_plus:
+    id: "5+"
+    label: "5+ years React Native"
+    path: resumes/Athul_S_Babu-_Software_Developer_5_.pdf
+    years: 5
+  six_plus:
+    id: "6+"
+    label: "6+ years React Native"
+    path: resumes/Athul_S_Babu-_Software_Developer_6_.pdf
+    years: 6
+
+# Prefer 6+ resume when title/JD signals senior / lead / banking / enterprise
+resume_six_plus_signals:
+  - senior
+  - lead
+  - principal
+  - architect
+  - technical lead
+  - staff
+  - banking
+  - financial services
+  - digital banking
+  - enterprise
+  - consultant
+  - "6+"
+  - "7+"
+  - "8+"
+
+target_roles:
+  primary:
+    - Senior React Native Developer
+    - React Native Mobile App Developer
+    - Senior Mobile Application Developer
+    - React Native Engineer
+    - Senior React Native Engineer
+    - Mobile Application Engineer
+    - React Native / React.js Developer
+    - Senior Mobile Software Engineer
+    - Mobile Application Development Engineer
+    - Full Stack Mobile Developer
+    - iOS & Android Application Developer – React Native
+    - Cross-Platform Mobile Developer
+    - Mobile Software Engineer
+    - Mobile App Performance Engineer
+    - Mobile Application Technical Lead
+    - Mobile Solutions Engineer
+    - React Native Consultant
+  fullstack:
+    - Senior Full Stack Developer
+    - Full Stack Software Engineer
+    - Full Stack JavaScript Developer
+    - React.js & Node.js Developer
+    - MERN Stack Developer
+    - Full Stack Application Developer
+    - Software Development Engineer
+    - Senior Software Developer
+  banking_fintech:
+    - React Native Developer – Banking
+    - Frontend Developer – Banking Applications
+    - Senior React Developer – Financial Services
+    - Mobile Application Engineer – Digital Banking
+    - Frontend Engineer – Enterprise Applications
+    - Software Engineer – Digital Banking
+
+# Keywords used for scoring (weighted in matcher)
+skills_weights:
+  react native: 25
+  react.js: 12
+  react: 10
+  typescript: 10
+  javascript: 6
+  node.js: 10
+  next.js: 8
+  postgresql: 6
+  mongodb: 4
+  aws: 5
+  mobile: 8
+  ios: 5
+  android: 5
+  rest api: 5
+  ci/cd: 3
+  offline: 4
+  watermelon: 3
+  jest: 2
+  banking: 6
+  fintech: 6
+
+output:
+  excel: output/daily_jobs.xlsx
+  csv: output/daily_jobs.csv
+  json: output/daily_jobs.json
+  sheet_name: Daily Matches

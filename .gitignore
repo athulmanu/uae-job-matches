@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.env
+.env.local
+*.json.key
+**/service-account*.json
+/tmp/
+.DS_Store
+output/*.xlsx
+# keep csv/json optional in git for dashboard — jobs.json is committed by CI

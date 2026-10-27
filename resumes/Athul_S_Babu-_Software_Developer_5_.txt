@@ -1,0 +1,98 @@
+WORK EXPERIENCE
+PROFESSIONAL SUMMARY
+SKILLS
+React Native Developer with 5+ years of experience building scalable and high-performance mobile
+applications for iOS and Android. Proficient in React Native, Next.js, Node.js, TypeScript, PostgreSQL,
+and SQL, with expertise in offline-first architectures using WatermelonDB, REST API development, AWS
+deployments, and CI/CD automation. Experienced in application security (VAPT), performance
+optimization, and delivering enterprise-grade solutions from development to production in Agile
+environments.
+ATHUL S BABU
+Address: 
+Phone:
+Email: 
+LinkedIn : 
+Abu Dhabi, UAE
++971 55 838 6904
+athul290@gmail.com
+www.linkedin.com/in/athulsbabu
+SOFTWARE ENGINEER 
+Mobile Development: React Native, JavaScript (ES6+), TypeScript
+Frontend: React.js, HTML5, CSS3, SCSS, Bootstrap, Next.js
+Backend: Node.js, MongoDB, Python (Flask), REST APIs
+Databases: PostgreSQL, SQL, WatermelonDB, Offline-First Architecture
+Tools & DevOps: AWS, Git, CI/CD, VPS Deployment, JIRA, Storybook, Agile/Scrum
+Security: VAPT Remediation, SSL Pinning, Secure Authentication
+Testing: Jest, Unit Testing
+AI Development Tools: Cursor.Ai, Claude Code, Copilot, Codex, OpenAI.
+AI & Automation: Generative AI, LLM Integration, AI-Powered Development, AI Data Analysis, Intelligent
+Report Analysis, AI Workflow Automation, AI Content Generation, Prompt Engineering, AI API Integration,
+Business Process Automation
+Nov 2025 - PresentFull Stack Developer
+Greenfield Marine Technologies - UAE Abudhabi
+Developed and maintained enterprise-grade mobile and web applications including ShipArc.ai
+and Voyage.IQ using React Native, Next.js, Node.js, and PostgreSQL.
+Designed and implemented scalable REST APIs and backend services to support vessel
+management, audit, training, reporting, and compliance workflows.
+Built offline-first functionality with local data storage and synchronization mechanisms, ensuring
+uninterrupted operations in low-connectivity environments.
+Developed and enhanced core modules including Audit Management, HSE, Training, Quiz,
+Rewards, Reporting, Engine Management, and Deck Management.
+Implemented Over-the-Air (OTA) update solutions for Android and iOS, enabling seamless
+application deployments without app store releases.
+Optimized application performance, state management, and data synchronization processes to
+improve user experience and system reliability.
+Collaborated with cross-functional teams, stakeholders, and clients to gather requirements,
+design solutions, and deliver new features.
+Developed AI-powered analysis workflows for crew reports, enabling automated analysis of
+operational reports and identification of critical findings, risks, and actionable insights.
+Implemented AI-driven critical analysis of validated reports to identify important operational
+patterns and generate structured insights for management and compliance teams.
+Marine technology company focused on vessel management, audits, and compliance solutions.
+EDUCATION
+ Aug 2018 - Jul 2022B . E Computer Science and Engineering
+ANNA UNIVERSITY - Dhanalakshmi srinivasan college of engineering,
+Coimbatore
+CGPA : 7.68
+Apr 2024 - Jun 2024
+Freelance Mobile Application Developer
+Freelance Project
+Developed a PG registration mobile app using React Native and Node.js for property owners in
+Bengaluru.
+Implemented backend modules for tenant registration, data storage, and real-time updates.
+Focused on UI/UX consistency and data validation to ensure seamless user experience.
+Jul 2024 - Sep 2024
+Associate Software Engineer
+Fivsys
+Developed a PG registration mobile app using React Native and Node.js for property owners in
+Bengaluru.
+Implemented backend modules for tenant registration, data storage, and real-time updates.
+Focused on UI/UX consistency and data validation to ensure seamless user experience.
+Mar 2023 - Mar 2024
+Software Engineer Trainee
+Seidor Opentrends
+Contributed to the Kuady Wallet App, supporting cross-border online payments for Spain,
+Colombia, and Mexico.
+Implemented features for virtual cards, money transfers, and transaction tracking using React
+Native.
+Performed unit testing (Jest) and integrated CI/CD pipelines using Bitbucket.
+Collaborated with the QA team to deliver bug-free and optimized releases for Android & iOS.
+Sep 2024 - Oct 2025Senior Software Engineer / Chief Technical Officer
+Envinto LLP
+Led multiple end-to-end mobile and web projects using React Native, React.js, and Node.js for
+clients in social, ERP, and e-commerce sectors.
+Social Media App: Designed and built a cross-platform platform inspired by Instagram and
+Twitter with interactive features (posts, likes, comments).
+ERP App: Delivered a complete mobile ERP solution for service providers, integrating job
+assignment, notifications, inventory, and invoicing.
+E-commerce Platforms: Developed boutique and customizable product stores using React.js,
+Node.js, and MongoDB, deploying via VPS for scalability.
+Managed UI/UX optimization, API integration, and server deployment for multiple client projects.
+Supervised small dev teams and contributed to architecture design decisions.
+Tech company empowering businesses across industries through scalable web, mobile, and digital solutions.
+Performed bug fixing, security enhancements, and VAPT remediation activities to improve application
+security and compliance.
+Managed CI/CD workflows, production deployments, and release processes across mobile and web
+platforms.
+Participated in React Native version upgrades, dependency modernization, and application
+architecture improvements to ensure long-term maintainability.
