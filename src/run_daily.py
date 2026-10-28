@@ -13,6 +13,7 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from config_loader import all_target_roles, load_config  # noqa: E402
 from fetchers import collect_jobs, uae_apis_configured  # noqa: E402
+from groq_rank import groq_enabled, refine_with_groq  # noqa: E402
 from matcher import rank_jobs  # noqa: E402
 from sheets import push_google_sheet  # noqa: E402
 from writers import write_csv, write_excel, write_json  # noqa: E402
@@ -66,8 +67,24 @@ def main() -> int:
     )
     raw = collect_jobs(cfg, queries)
     print(f"  Raw candidates after location/age filters: {len(raw)}")
-    matched = rank_jobs(raw, cfg, roles)
-    print(f"  Matched above score {cfg.get('min_score')}: {len(matched)}")
+    # Lower keyword gate when Groq will re-rank (catch more UAE eng roles)
+    keyword_min = float(cfg.get("min_score") or 35)
+    rank_cfg = dict(cfg)
+    if groq_enabled():
+        keyword_min = min(keyword_min, 20.0)
+        rank_cfg["min_score"] = keyword_min
+        rank_cfg["groq_passthrough"] = True
+        print(f"  Groq: enabled ({__import__('os').environ.get('GROQ_MODEL', 'openai/gpt-oss-20b')}) — prefilter min={keyword_min}")
+    else:
+        print("  Groq: disabled (set GROQ_API_KEY)")
+    matched = rank_jobs(raw, rank_cfg, roles)
+    print(f"  After keyword match: {len(matched)}")
+    if groq_enabled() and matched:
+        matched = refine_with_groq(
+            matched, cfg, roles, min_score=float(cfg.get("min_score") or 35)
+        )
+        print(f"  After Groq refine: {len(matched)}")
+    print(f"  Final matches (min {cfg.get('min_score')}): {len(matched)}")
 
     out_cfg = cfg.get("output") or {}
     excel_path = ROOT / out_cfg.get("excel", "output/daily_jobs.xlsx")
@@ -89,12 +106,15 @@ def main() -> int:
             "min_score": cfg.get("min_score"),
             "role_count": len(roles),
             "uae_apis": apis,
+            "groq": groq_enabled(),
+            "groq_model": __import__("os").environ.get("GROQ_MODEL", "openai/gpt-oss-20b")
+            if groq_enabled()
+            else None,
             "needs_api_keys": False,
             "message": (
-                "Pulling UAE roles from curated company career pages (Greenhouse/Lever). "
-                "JSearch optional for broader coverage."
-                if not apis["jsearch"]
-                else None
+                "Career boards + Groq ranking."
+                if groq_enabled()
+                else "Career boards only. Add GROQ_API_KEY for smarter ranking."
             ),
         },
     )

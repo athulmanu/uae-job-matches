@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-10-27T20:02:36.195834+00:00",
+  "generated_at": "2026-10-28T04:48:08.034221+00:00",
   "count": 0,
   "meta": {
     "locations": [
@@ -14,12 +14,14 @@
     "min_score": 35,
     "role_count": 31,
     "uae_apis": {
-      "jsearch": true,
+      "jsearch": false,
       "jooble": false,
       "career_boards": true
     },
+    "groq": true,
+    "groq_model": "openai/gpt-oss-20b",
     "needs_api_keys": false,
-    "message": null
+    "message": "Career boards + Groq ranking."
   },
   "jobs": []
 }

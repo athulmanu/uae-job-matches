@@ -66,18 +66,21 @@ def is_relevant_title(job: dict[str, Any]) -> bool:
     reject = (
         "product manager",
         "account executive",
+        "account manager",
         "customer success",
         "sales",
         "recruiter",
-        "devops only",
-        "machine learning",
-        "ml engineer",
-        "data scientist",
+        "marketing",
+        "accountant",
+        "accounting",
+        "money laundering",
+        "business development",
         "partnerships manager",
         "engineering manager",
-        "security software",
-        "storage",
         "new grad",
+        "talent pool",
+        "onboarding associate",
+        "communications associate",
     )
     if any(r in title for r in reject):
         return False
@@ -105,6 +108,10 @@ def is_relevant_title(job: dict[str, Any]) -> bool:
         "software developer",
         "application developer",
         "application engineer",
+        "solutions architect",
+        "flutter",
+        "engineer",
+        "developer",
     )
     return any(a in title for a in accept)
 
@@ -140,8 +147,46 @@ def pick_resume(job: dict[str, Any], cfg: dict[str, Any]) -> dict[str, str]:
 
 
 def score_job(job: dict[str, Any], cfg: dict[str, Any], roles: list[str]) -> dict[str, Any]:
+    groq_pass = bool(cfg.get("groq_passthrough"))
+    source = str(job.get("source") or "")
+    career = source.startswith(("greenhouse:", "lever:"))
+
+    title_l = (job.get("title") or "").lower()
+    hard_no = (
+        "account manager",
+        "account executive",
+        "sales",
+        "marketing",
+        "accountant",
+        "accounting",
+        "business development",
+        "recruiter",
+        "talent pool",
+        "money laundering",
+        "communications associate",
+        "onboarding associate",
+        "people services",
+        "emiratisation",
+    )
     if not is_relevant_title(job):
-        out = {**job, "match_score": 0.0, "matched_role": "", "matched_skills": "", "why_match": "Filtered: title not RN/mobile/fullstack JS"}
+        # When Groq will re-rank, pass borderline UAE career roles (skip obvious non-eng)
+        if groq_pass and career and not any(x in title_l for x in hard_no):
+            resume = pick_resume(job, cfg)
+            out = {**job, **resume}
+            out.pop("posted_dt", None)
+            out["match_score"] = 25.0
+            out["matched_role"] = ""
+            out["matched_skills"] = ""
+            out["why_match"] = "Queued for Groq relevance check"
+            out["apply_status"] = "pending"
+            return out
+        out = {
+            **job,
+            "match_score": 0.0,
+            "matched_role": "",
+            "matched_skills": "",
+            "why_match": "Filtered: title not RN/mobile/fullstack JS",
+        }
         out.pop("posted_dt", None)
         out.update({"resume_id": "", "resume_label": "", "resume_path": "", "apply_status": "skipped"})
         return out
